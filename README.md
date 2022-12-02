@@ -28,3 +28,8 @@ Or you can run the preconfigured gdb script
 ```sh
 $ gdb -x openocd.gdb target/thumbv7em-none-eabi/$RELEASE_OR_DEBUG/embedded_blockchain
 ```
+
+alternatively, you can use `cargo` to configure GDB
+```sh
+$ cargo run
+```
