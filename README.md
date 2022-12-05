@@ -31,5 +31,5 @@ $ gdb -x openocd.gdb target/thumbv7em-none-eabi/$RELEASE_OR_DEBUG/embedded_block
 
 alternatively, you can use `cargo` to configure GDB
 ```sh
-$ cargo run
+$ cargo +nightly run --release
 ```
