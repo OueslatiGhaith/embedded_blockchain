@@ -10,9 +10,8 @@ use alloc::vec::{self, Vec};
 use alloc_cortex_m::CortexMHeap;
 use core::alloc::Layout;
 use core::any::TypeId;
-use core::panic::PanicInfo;
-
 use core::mem::MaybeUninit;
+use core::panic::PanicInfo;
 
 // pick a panicking behavior
 // use panic_semihosting as _; // you can put a breakpoint on `rust_begin_unwind` to catch panics
@@ -29,7 +28,6 @@ static ALLOCATOR: CortexMHeap = CortexMHeap::empty();
 mod app;
 mod behviour;
 mod block;
-mod p2p;
 
 #[derive(serde::Serialize)]
 struct SerializableData {
