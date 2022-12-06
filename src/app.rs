@@ -42,19 +42,10 @@ impl App {
         if block.previous_hash != previous_block.hash {
             hprintln!("[WARN] block with id: {} has wrong previous hash", block.id);
             return false;
-        } else if {
-            let mut buffer = [0u8; 4];
-            hex::decode_to_slice(&block.hash, &mut buffer)
-                .expect("[ERROR] failed to decode block hash");
-            !hash_to_base_representation(&buffer, 2).starts_with(block::DIFFICULTY_PREFIX)
-        } {
+        } else if !check_difficulty(block) {
             hprintln!("[WARN] block with id: {} has invalid difficulty", block.id);
             return false;
-        } else if {
-            let hash =
-                block::calculate_hash(block.id, &block.previous_hash, &block.data, block.nonce);
-            hash.as_slice().encode_hex::<String>() != block.hash
-        } {
+        } else if !check_hash(block) {
             hprintln!("[WARN] block with id: {} has invalid hash", block.id);
             return false;
         }
@@ -96,4 +87,17 @@ impl App {
             panic!("[ERROR] local and remote chains are both invalid!");
         }
     }
+}
+
+fn check_difficulty(block: &Block) -> bool {
+    let mut buffer = [0u8; 20];
+    hex::decode_to_slice(&block.hash, &mut buffer).expect("[ERROR] failed to decode block hash");
+
+    hash_to_base_representation(&buffer, 2).starts_with(block::DIFFICULTY_PREFIX)
+}
+
+fn check_hash(block: &Block) -> bool {
+    let hash = block::calculate_hash(block.id, &block.previous_hash, &block.data, block.nonce);
+
+    hash.as_slice().encode_hex::<String>() == block.hash
 }

@@ -18,5 +18,6 @@ pub fn create_block(app: &mut App) {
     );
     let json = serde_json::to_string(&block).expect("[ERROR] can't stringify request");
     app.blocks.push(block);
+    // app.try_add_block(block);
     // hprintln!("[INFO] broadcasting new block...")
 }

@@ -1,22 +1,24 @@
 #![no_std]
 #![no_main]
 #![feature(alloc_error_handler)]
+#![feature(panic_info_message)]
 
 extern crate alloc;
 
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use alloc::vec::{self, Vec};
 use alloc_cortex_m::CortexMHeap;
 use core::alloc::Layout;
+use core::any::TypeId;
 use core::panic::PanicInfo;
 
 use core::mem::MaybeUninit;
 
 // pick a panicking behavior
-use panic_halt as _; // you can put a breakpoint on `rust_begin_unwind` to catch panics
-                     // use panic_abort as _; // requires nightly
-                     // use panic_itm as _; // logs messages over ITM; requires ITM support
-                     // use panic_semihosting as _; // logs messages to the host stderr; requires a debugger
+// use panic_semihosting as _; // you can put a breakpoint on `rust_begin_unwind` to catch panics
+// use panic_abort as _; // requires nightly
+// use panic_itm as _; // logs messages over ITM; requires ITM support
+// use panic_semihosting as _; // logs messages to the host stderr; requires a debugger
 
 use cortex_m_rt::entry;
 use cortex_m_semihosting::hprintln;
@@ -53,17 +55,6 @@ fn main() -> ! {
     app.genesis();
     behviour::print_chain(&app);
 
-    let a: serde_json_core::heapless::String<256> =
-        serde_json_core::ser::to_string(&SerializableData {
-            data: "block".to_string(),
-            id: 0,
-            nonce: 0,
-            previous_hash: "198d6f2d9f7b588848c3e212eb460626189a0b0fbb252eab42d3b5a4f09b7c83"
-                .to_string(),
-        })
-        .unwrap();
-    hprintln!("{}", a.to_string());
-
     loop {
         behviour::create_block(&mut app);
     }
@@ -72,5 +63,15 @@ fn main() -> ! {
 #[alloc_error_handler]
 fn oom(_: Layout) -> ! {
     hprintln!("[ERROR] out of memory!");
+    loop {}
+}
+
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    match info.message() {
+        Some(m) => hprintln!("[PANIC] {:#?}", m),
+        None => hprintln!("[PANIC] panic occured!"),
+    }
+
     loop {}
 }
